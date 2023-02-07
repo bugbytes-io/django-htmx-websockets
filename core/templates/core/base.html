@@ -12,13 +12,14 @@
     <!-- Tailwind and Tailwind-Elements -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tw-elements/dist/css/index.min.css" />
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/htmx.org/dist/ext/ws.js"></script>
 
     {% block head %}
 
     {% endblock %}
 </head>
 
-<body>
+<body hx-ext="ws" ws-connect="/ws/notifications/">
 
     {% include 'core/navbar.html' %}
 
@@ -29,6 +30,27 @@
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/tw-elements/dist/js/index.min.js"></script>
+    <script>
+        let numberSpan = document.getElementById('notification-number');
 
+        document.body.addEventListener('htmx:wsAfterMessage', (e) => {
+            let numberOfNotifications = numberSpan.innerHTML;
+            console.log(numberOfNotifications)
+            if (!numberOfNotifications) {
+                numberSpan.innerHTML = 1;
+            } else {
+                numberSpan.innerHTML = parseInt(numberOfNotifications) + 1;                
+            }
+        });
+
+        let clearBtn = document.getElementById('clear-btn');
+
+        clearBtn.addEventListener('click', (e) => {
+            let dropdown = document.getElementById('notification-dropdown');
+            let notifications = dropdown.querySelectorAll('div')
+            notifications.forEach(notification => notification.remove())
+            numberSpan.innerHTML = ''
+        });
+    </script>
 </body>
 </html>
